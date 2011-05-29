@@ -194,7 +194,11 @@ static const ActionMapping actions[] =
         {"yellow"            , ACTION_TELETEXT_YELLOW},
         {"blue"              , ACTION_TELETEXT_BLUE},
         {"increasepar"       , ACTION_INCREASE_PAR},
-        {"decreasepar"       , ACTION_DECREASE_PAR}};
+        {"decreasepar"       , ACTION_DECREASE_PAR},
+		{"overscannormal"    , ACTION_OVERSCAN_NORMAL},
+		{"overscanalt1"      , ACTION_OVERSCAN_ALT_1},
+		{"copyoverscan"      , ACTION_COPY_OVERSCAN},
+		{"nextoverscan"      , ACTION_NEXT_OVERSCAN}};
 
 static const ActionMapping windows[] =
        {{"home"                     , WINDOW_HOME},

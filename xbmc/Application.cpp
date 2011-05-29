@@ -2418,6 +2418,45 @@ bool CApplication::OnAction(const CAction &action)
     return true;
   }
 
+  if (action.GetID() == ACTION_NEXT_OVERSCAN)
+  {
+	RESOLUTION res = g_graphicsContext.GetVideoResolution();
+	// Change overscan "preset"
+    g_graphicsContext.SelectOverscanModeCinemascope(!g_settings.m_useCinemascopeAR);
+	if (g_settings.m_useCinemascopeAR)
+		m_guiDialogKaiToast.QueueNotification(CGUIDialogKaiToast::Info,g_localizeStrings.Get(20458),g_localizeStrings.Get(20460));
+	else
+	    m_guiDialogKaiToast.QueueNotification(CGUIDialogKaiToast::Info,g_localizeStrings.Get(20458),g_localizeStrings.Get(20459));
+		
+	return true;
+  }
+  
+  if (action.GetID() == ACTION_OVERSCAN_NORMAL)
+  {
+	RESOLUTION res = g_graphicsContext.GetVideoResolution();
+
+	// Change overscan "preset" if needed
+	if (g_settings.m_useCinemascopeAR)
+	{  
+	  g_graphicsContext.SelectOverscanModeCinemascope(false);
+      m_guiDialogKaiToast.QueueNotification(CGUIDialogKaiToast::Info,g_localizeStrings.Get(20458),g_localizeStrings.Get(20459));
+	}	
+	return true;
+  }
+
+  if (action.GetID() == ACTION_OVERSCAN_ALT_1)
+  {
+	RESOLUTION res = g_graphicsContext.GetVideoResolution();
+
+	// Change overscan "preset" if needed
+	if (!g_settings.m_useCinemascopeAR)
+	{  
+	  g_graphicsContext.SelectOverscanModeCinemascope(true);
+      m_guiDialogKaiToast.QueueNotification(CGUIDialogKaiToast::Info,g_localizeStrings.Get(20458),g_localizeStrings.Get(20460));
+	}	
+	return true;
+  }
+
   if (action.IsMouse())
   {
     g_Mouse.SetActive(true);

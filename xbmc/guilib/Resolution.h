@@ -23,6 +23,8 @@
 
 #include <stdint.h>
 #include "utils/StdString.h"
+#include <vector>
+
 
 typedef int DisplayMode;
 #define DM_WINDOWED     -1
@@ -81,6 +83,7 @@ public:
 struct RESOLUTION_INFO
 {
   OVERSCAN Overscan;
+  std::vector<OVERSCAN> OverscanVect;
   bool bFullScreen;
   int iScreen;
   int iWidth;
@@ -102,6 +105,9 @@ public:
     bFullScreen = true;
     fRefreshRate = 0;
     dwFlags = iSubtitles = iScreen = 0;
+	OverscanVect.push_back(Overscan);
+	OverscanVect.push_back(Overscan); //TODO: make number of overscan settings dynamic
+
   }
   float DisplayRatio() const
   {
@@ -114,5 +120,6 @@ public:
     iSubtitles = res.iSubtitles; dwFlags = res.dwFlags;
     fPixelRatio = res.fPixelRatio; fRefreshRate = res.fRefreshRate;
     strMode = res.strMode; strOutput = res.strOutput; strId = res.strId;
+	OverscanVect = res.OverscanVect;
   }
 };

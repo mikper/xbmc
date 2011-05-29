@@ -65,6 +65,9 @@
       <tab>FullScreen</tab>
       <printscreen>Screenshot</printscreen>
       <s mod="ctrl">Screenshot</s>
+      <o mod="ctrl,shift">nextoverscan</o>
+      <z mod="ctrl">overscannormal</z>
+      <z mod="ctrl,shift">overscanalt1</z>
       <minus>VolumeDown</minus>
       <plus>VolumeUp</plus>
       <zero>Number0</zero>
@@ -340,6 +343,7 @@
       <enter>NextCalibration</enter>
       <d>ResetCalibration</d>
       <r>NextResolution</r>
+      <c>CopyOverscan</c>
     </keyboard>
   </ScreenCalibration>
   <GUICalibration>

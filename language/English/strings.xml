@@ -1877,6 +1877,13 @@
   <string id="20453">episodes</string>
   <string id="20454">Listener</string>
   <string id="20455">Listeners</string>
+  <string id="20456">Copy overscan settings</string>
+  <string id="20457">Apply this overscan setting to all refresh rates for current resolution?</string>
+  <string id="20458">Display mode</string>
+  <string id="20459">Normal</string>
+  <string id="20460">Cinemascope</string>
+  
+  
   <!-- up to 21329 is reserved for the video db !! !-->
 
   <string id="21330">Show hidden files and directories</string>

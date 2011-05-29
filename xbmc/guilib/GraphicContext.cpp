@@ -384,12 +384,45 @@ RESOLUTION CGraphicContext::GetVideoResolution() const
   return m_Resolution;
 }
 
+void CGraphicContext::SelectOverscanModeCinemascope(bool isCsAr)
+{
+
+  if (g_settings.m_useCinemascopeAR == isCsAr) { return; }
+  
+  int modeSel = (isCsAr ? 1: 0);
+  int prevModeSel = (g_settings.m_useCinemascopeAR ? 1 : 0);
+  // For all resolutions including and above RES_WINDOW,
+  // store the active and replace with the selected.
+  for (size_t i = RES_WINDOW ; i < g_settings.m_ResInfo.size() ; i++)
+  {
+	  g_settings.m_ResInfo[i].OverscanVect[prevModeSel] = g_settings.m_ResInfo[i].Overscan;
+	  g_settings.m_ResInfo[i].Overscan = g_settings.m_ResInfo[i].OverscanVect[modeSel];
+  }
+
+  g_settings.m_useCinemascopeAR = isCsAr;
+  
+  SetVideoResolution(m_Resolution, true);
+}
+
 void CGraphicContext::ResetOverscan(RESOLUTION_INFO &res)
 {
   res.Overscan.left = 0;
   res.Overscan.top = 0;
   res.Overscan.right = res.iWidth;
   res.Overscan.bottom = res.iHeight;
+  
+  res.OverscanVect[0].left = 0;
+  res.OverscanVect[0].top = 0;
+  res.OverscanVect[0].right = res.iWidth;
+  res.OverscanVect[0].bottom = res.iHeight;
+  
+  float defaultAR = 2.35;
+  int defH = (int) ((float)res.iWidth/defaultAR);
+  defH = (defH > res.iHeight) ? res.iHeight : defH; //ensure the default cinemascope aspect is not greater than aspect of display.
+  res.OverscanVect[1].left = 0;
+  res.OverscanVect[1].top = (res.iHeight-defH)/2;
+  res.OverscanVect[1].right = res.iWidth;
+  res.OverscanVect[1].bottom = res.OverscanVect[1].top+defH;
 }
 
 void CGraphicContext::ResetOverscan(RESOLUTION res, OVERSCAN &overscan)

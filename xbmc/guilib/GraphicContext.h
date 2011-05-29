@@ -95,7 +95,8 @@ public:
   void ResetOverscan(RESOLUTION res, OVERSCAN &overscan);
   void ResetOverscan(RESOLUTION_INFO &resinfo);
   void ResetScreenParameters(RESOLUTION res);
-  void Lock() { EnterCriticalSection(*this); }
+  void SelectOverscanModeCinemascope(bool isCsAr);
+  void Lock() { EnterCriticalSection(*this);  }
   void Unlock() { LeaveCriticalSection(*this); }
   float GetPixelRatio(RESOLUTION iRes) const;
   void CaptureStateBlock();

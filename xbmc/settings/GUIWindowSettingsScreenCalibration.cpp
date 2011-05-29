@@ -93,6 +93,41 @@ bool CGUIWindowSettingsScreenCalibration::OnAction(const CAction &action)
     }
     break;
 
+  case ACTION_COPY_OVERSCAN:
+    {
+      CGUIDialogYesNo* pDialog = (CGUIDialogYesNo*)g_windowManager.GetWindow(WINDOW_DIALOG_YES_NO);
+      pDialog->SetHeading(20456);
+      pDialog->SetLine(0, 20457);
+      //pDialog->SetLine(1, 20327);
+      pDialog->SetChoice(0, 222);
+      pDialog->SetChoice(1, 186);
+      pDialog->DoModal();
+      if (pDialog->IsConfirmed())
+      {
+		int tmpH = g_settings.m_ResInfo[m_Res[m_iCurRes]].iHeight;
+		int tmpW = g_settings.m_ResInfo[m_Res[m_iCurRes]].iWidth;
+		RESOLUTION myRes = m_Res[m_iCurRes];
+		int activeOverscan = g_settings.m_useCinemascopeAR?1:0;
+		// Copy overscan settings to all resolutions with same screen
+		// dimension.
+		for (int i = RES_WINDOW; i < g_settings.m_ResInfo.size(); i++)
+		{
+			if (i == myRes) 
+				continue;
+			
+			if ( g_settings.m_ResInfo[i].iHeight == tmpH &&
+				 g_settings.m_ResInfo[i].iWidth == tmpW ) 
+			{
+				g_settings.m_ResInfo[i].Overscan = g_settings.m_ResInfo[myRes].Overscan;
+				g_settings.m_ResInfo[i].OverscanVect[activeOverscan] = g_settings.m_ResInfo[myRes].OverscanVect[activeOverscan];
+				g_settings.m_ResInfo[i].iSubtitles = g_settings.m_ResInfo[myRes].iSubtitles;
+			}
+		}
+      }
+      return true;
+    }
+    break;
+
   case ACTION_CHANGE_RESOLUTION:
     // choose the next resolution in our list
     {
@@ -123,11 +158,12 @@ bool CGUIWindowSettingsScreenCalibration::OnMessage(CGUIMessage& message)
   {
   case GUI_MSG_WINDOW_DEINIT:
     {
-      g_settings.Save();
+	  g_settings.m_ResInfo[m_Res[m_iCurRes]].OverscanVect[g_settings.m_useCinemascopeAR?1:0] = g_settings.m_ResInfo[m_Res[m_iCurRes]].Overscan; 
+	  g_settings.Save();
       g_graphicsContext.SetCalibrating(false);
       g_windowManager.ShowOverlay(OVERLAY_STATE_SHOWN);
       // reset our screen resolution to what it was initially
-      g_graphicsContext.SetVideoResolution(g_guiSettings.m_LookAndFeelResolution);
+      g_graphicsContext.SetVideoResolution(g_guiSettings.m_LookAndFeelResolution,true);
       // Inform the player so we can update the resolution
 #ifdef HAS_VIDEO_PLAYBACK
       g_renderManager.Update(false);

@@ -266,6 +266,13 @@
 #define ACTION_PREV_CONTROL           182
 #define ACTION_CHANNEL_SWITCH         183
 
+#define ACTION_OVERSCAN_NORMAL        190 // 
+#define ACTION_OVERSCAN_ALT_1         191 // 
+#define ACTION_OVERSCAN_ALT_2         192 // 
+#define ACTION_OVERSCAN_ALT_3         193 // 
+#define ACTION_COPY_OVERSCAN          197 // Copy overscan settings to all resolutions with same dimensions '
+										  //(i.e. make all refresh rates look the same)
+#define ACTION_NEXT_OVERSCAN          198 // jump to next overscan (zoom) setting
 #define ACTION_TOGGLE_FULLSCREEN      199 // switch 2 desktop resolution
 #define ACTION_TOGGLE_WATCHED         200 // Toggle watched status (videos)
 #define ACTION_SCAN_ITEM              201 // scan item

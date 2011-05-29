@@ -889,7 +889,7 @@ void CGUIWindowFullScreen::RenderTTFSubtitles()
       float textWidth, textHeight;
       m_subsLayout->GetTextExtent(textWidth, textHeight);
       float x = maxWidth * 0.5f + g_settings.m_ResInfo[res].Overscan.left;
-      float y = g_settings.m_ResInfo[res].iSubtitles - textHeight;
+	  float y = (g_settings.m_ResInfo[res].iSubtitles-(g_settings.m_ResInfo[res].iHeight-g_settings.m_ResInfo[res].Overscan.bottom)) - textHeight;
 
       m_subsLayout->RenderOutline(x, y, 0, 0xFF000000, XBFONT_CENTER_X, maxWidth);
     }

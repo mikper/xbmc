@@ -216,6 +216,8 @@ public:
 
   CStdString m_userAgent;
 
+  bool m_useCinemascopeAR;
+
   struct RssSet
   {
     bool rtl;
