@@ -384,13 +384,13 @@ RESOLUTION CGraphicContext::GetVideoResolution() const
   return m_Resolution;
 }
 
-void CGraphicContext::SelectOverscanModeCinemascope(bool isCsAr)
+void CGraphicContext::SelectOverscanEntry(int overscanEntryIndex)
 {
 
-  if (g_settings.m_useCinemascopeAR == isCsAr) { return; }
+  if (g_settings.m_overscanEntryIndex == overscanEntryIndex) { return; }
   
-  int modeSel = (isCsAr ? 1: 0);
-  int prevModeSel = (g_settings.m_useCinemascopeAR ? 1 : 0);
+  int modeSel = overscanEntryIndex;
+  int prevModeSel = g_settings.m_overscanEntryIndex;
   // For all resolutions including and above RES_WINDOW,
   // store the active and replace with the selected.
   for (size_t i = RES_WINDOW ; i < g_settings.m_ResInfo.size() ; i++)
@@ -399,8 +399,9 @@ void CGraphicContext::SelectOverscanModeCinemascope(bool isCsAr)
 	  g_settings.m_ResInfo[i].Overscan = g_settings.m_ResInfo[i].OverscanVect[modeSel];
   }
 
-  g_settings.m_useCinemascopeAR = isCsAr;
-  
+  //g_settings.m_useCinemascopeAR = isCsAr;
+  g_settings.m_overscanEntryIndex = overscanEntryIndex;
+
   SetVideoResolution(m_Resolution, true);
 }
 

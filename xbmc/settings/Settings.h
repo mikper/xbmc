@@ -88,6 +88,12 @@ public:
   bool value;
 };
 
+struct OverscanEntry
+{
+  int index;
+  CStdString name;
+};
+
 class CGUISettings;
 class TiXmlElement;
 class TiXmlNode;
@@ -216,7 +222,9 @@ public:
 
   CStdString m_userAgent;
 
-  bool m_useCinemascopeAR;
+  //bool m_useCinemascopeAR;
+  int m_overscanEntryIndex;
+  std::vector<OverscanEntry> m_overscanEntries;
 
   struct RssSet
   {

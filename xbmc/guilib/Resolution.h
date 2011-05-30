@@ -105,8 +105,10 @@ public:
     bFullScreen = true;
     fRefreshRate = 0;
     dwFlags = iSubtitles = iScreen = 0;
-	OverscanVect.push_back(Overscan);
-	OverscanVect.push_back(Overscan); //TODO: make number of overscan settings dynamic
+	  OverscanVect.push_back(Overscan);
+	  OverscanVect.push_back(Overscan);
+	  OverscanVect.push_back(Overscan);
+	  OverscanVect.push_back(Overscan); //TODO: make number of overscan settings dynamic
 
   }
   float DisplayRatio() const
@@ -120,6 +122,6 @@ public:
     iSubtitles = res.iSubtitles; dwFlags = res.dwFlags;
     fPixelRatio = res.fPixelRatio; fRefreshRate = res.fRefreshRate;
     strMode = res.strMode; strOutput = res.strOutput; strId = res.strId;
-	OverscanVect = res.OverscanVect;
+	  OverscanVect = res.OverscanVect;
   }
 };

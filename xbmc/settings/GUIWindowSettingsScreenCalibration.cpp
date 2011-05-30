@@ -107,10 +107,11 @@ bool CGUIWindowSettingsScreenCalibration::OnAction(const CAction &action)
 		int tmpH = g_settings.m_ResInfo[m_Res[m_iCurRes]].iHeight;
 		int tmpW = g_settings.m_ResInfo[m_Res[m_iCurRes]].iWidth;
 		RESOLUTION myRes = m_Res[m_iCurRes];
-		int activeOverscan = g_settings.m_useCinemascopeAR?1:0;
+//		int activeOverscan = g_settings.m_useCinemascopeAR?1:0;
+		int activeOverscan = g_settings.m_overscanEntryIndex;
 		// Copy overscan settings to all resolutions with same screen
 		// dimension.
-		for (int i = RES_WINDOW; i < g_settings.m_ResInfo.size(); i++)
+		for (int i = RES_WINDOW; i < (int)g_settings.m_ResInfo.size(); i++)
 		{
 			if (i == myRes) 
 				continue;
@@ -158,8 +159,8 @@ bool CGUIWindowSettingsScreenCalibration::OnMessage(CGUIMessage& message)
   {
   case GUI_MSG_WINDOW_DEINIT:
     {
-	  g_settings.m_ResInfo[m_Res[m_iCurRes]].OverscanVect[g_settings.m_useCinemascopeAR?1:0] = g_settings.m_ResInfo[m_Res[m_iCurRes]].Overscan; 
-	  g_settings.Save();
+      g_settings.m_ResInfo[m_Res[m_iCurRes]].OverscanVect[g_settings.m_overscanEntryIndex] = g_settings.m_ResInfo[m_Res[m_iCurRes]].Overscan; 
+	    g_settings.Save();
       g_graphicsContext.SetCalibrating(false);
       g_windowManager.ShowOverlay(OVERLAY_STATE_SHOWN);
       // reset our screen resolution to what it was initially

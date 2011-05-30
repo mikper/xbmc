@@ -511,7 +511,7 @@ bool CAdvancedSettings::Load()
         pRefreshFallback = pRefreshFallback->NextSiblingElement("fallback");
       }
     }
-
+    
     m_DXVACheckCompatibilityPresent = XMLUtils::GetBoolean(pElement,"checkdxvacompatibility", m_DXVACheckCompatibility);
 
   }

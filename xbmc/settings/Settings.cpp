@@ -138,7 +138,8 @@ void CSettings::Initialize()
   m_lastUsedProfile = 0;
   m_currentProfile = 0;
 
-  m_useCinemascopeAR = false;
+  //m_useCinemascopeAR = false;
+  m_overscanEntryIndex = 0;
 }
 
 CSettings::~CSettings(void)
@@ -512,19 +513,24 @@ bool CSettings::LoadCalibration(const TiXmlElement* pRoot, const CStdString& str
           GetInteger(pOverscan, "bottom", m_ResInfo[res].OverscanVect[0].bottom, m_ResInfo[res].iHeight, m_ResInfo[res].iHeight / 2, m_ResInfo[res].iHeight*3 / 2);
         }
 
-		const TiXmlElement *pOverscanWide = pResolution->FirstChildElement("overscan_1");
-        if (pOverscanWide)
+        for (int osi = 1 ; osi < (int)m_overscanEntries.size(); osi++)
         {
-          GetInteger(pOverscanWide, "left", m_ResInfo[res].OverscanVect[1].left, 0, -m_ResInfo[res].iWidth / 4, m_ResInfo[res].iWidth / 4);
-          GetInteger(pOverscanWide, "top", m_ResInfo[res].OverscanVect[1].top, 0, -m_ResInfo[res].iHeight / 4, m_ResInfo[res].iHeight / 4);
-          GetInteger(pOverscanWide, "right", m_ResInfo[res].OverscanVect[1].right, m_ResInfo[res].iWidth, m_ResInfo[res].iWidth / 2, m_ResInfo[res].iWidth*3 / 2);
-          GetInteger(pOverscanWide, "bottom", m_ResInfo[res].OverscanVect[1].bottom, m_ResInfo[res].iHeight, m_ResInfo[res].iHeight / 2, m_ResInfo[res].iHeight*3 / 2);
+          char elName[16];
+          sprintf(elName,"overscan_%d",osi);
+          const TiXmlElement *pOverscanAlt = pResolution->FirstChildElement(elName);
+          if (pOverscanAlt)
+          {
+            GetInteger(pOverscanAlt, "left", m_ResInfo[res].OverscanVect[osi].left, 0, -m_ResInfo[res].iWidth / 4, m_ResInfo[res].iWidth / 4);
+            GetInteger(pOverscanAlt, "top", m_ResInfo[res].OverscanVect[osi].top, 0, -m_ResInfo[res].iHeight / 4, m_ResInfo[res].iHeight / 4);
+            GetInteger(pOverscanAlt, "right", m_ResInfo[res].OverscanVect[osi].right, m_ResInfo[res].iWidth, m_ResInfo[res].iWidth / 2, m_ResInfo[res].iWidth*3 / 2);
+            GetInteger(pOverscanAlt, "bottom", m_ResInfo[res].OverscanVect[osi].bottom, m_ResInfo[res].iHeight, m_ResInfo[res].iHeight / 2, m_ResInfo[res].iHeight*3 / 2);
+          }
         }
-		
-		if (g_settings.m_useCinemascopeAR)
-			m_ResInfo[res].Overscan = m_ResInfo[res].OverscanVect[1];
-		else
-			m_ResInfo[res].Overscan = m_ResInfo[res].OverscanVect[0];
+
+//        if (g_settings.m_useCinemascopeAR)
+//	        m_ResInfo[res].Overscan = m_ResInfo[res].OverscanVect[1];
+//        else
+	      m_ResInfo[res].Overscan = m_ResInfo[res].OverscanVect[m_overscanEntryIndex];
 
         // get the appropriate "safe graphics area" = 10% for 4x3, 3.5% for 16x9
         float fSafe;
@@ -584,11 +590,11 @@ bool CSettings::SaveCalibration(TiXmlNode* pRootNode) const
 #endif
     // create the overscan child
     TiXmlElement overscanElement("overscan");
-	vector<OVERSCAN> tmpOverscanVect(m_ResInfo[i].OverscanVect);
-	if (m_useCinemascopeAR)
-		tmpOverscanVect[1] = m_ResInfo[i].Overscan;
-	else
-		tmpOverscanVect[0] = m_ResInfo[i].Overscan;
+    vector<OVERSCAN> tmpOverscanVect(m_ResInfo[i].OverscanVect);
+//    if (m_useCinemascopeAR)
+//      tmpOverscanVect[1] = m_ResInfo[i].Overscan;
+//    else
+		tmpOverscanVect[m_overscanEntryIndex] = m_ResInfo[i].Overscan;
 
     TiXmlNode *pOverscanNode = pNode->InsertEndChild(overscanElement);
     XMLUtils::SetInt(pOverscanNode, "left", tmpOverscanVect[0].left);
@@ -596,13 +602,17 @@ bool CSettings::SaveCalibration(TiXmlNode* pRootNode) const
     XMLUtils::SetInt(pOverscanNode, "right", tmpOverscanVect[0].right);
     XMLUtils::SetInt(pOverscanNode, "bottom", tmpOverscanVect[0].bottom);
     
-	TiXmlElement overscanWideElement("overscan_1");
-    TiXmlNode *pOverscanWideNode = pNode->InsertEndChild(overscanWideElement);
-    XMLUtils::SetInt(pOverscanWideNode, "left", tmpOverscanVect[1].left);
-    XMLUtils::SetInt(pOverscanWideNode, "top", tmpOverscanVect[1].top);
-    XMLUtils::SetInt(pOverscanWideNode, "right", tmpOverscanVect[1].right);
-    XMLUtils::SetInt(pOverscanWideNode, "bottom", tmpOverscanVect[1].bottom);
-	
+    for (int osi = 1; osi < (int)m_overscanEntries.size(); osi++)
+    {
+      char elName[16];
+      sprintf(elName,"overscan_%d",osi); 
+      TiXmlElement overscanWideElement(elName);
+      TiXmlNode *pOverscanWideNode = pNode->InsertEndChild(overscanWideElement);
+      XMLUtils::SetInt(pOverscanWideNode, "left", tmpOverscanVect[1].left);
+      XMLUtils::SetInt(pOverscanWideNode, "top", tmpOverscanVect[1].top);
+      XMLUtils::SetInt(pOverscanWideNode, "right", tmpOverscanVect[1].right);
+      XMLUtils::SetInt(pOverscanWideNode, "bottom", tmpOverscanVect[1].bottom);
+    }
   }
   return true;
 }
@@ -728,7 +738,24 @@ bool CSettings::LoadSettings(const CStdString& strSettingsFile)
     GetFloat(pElement, "subtitledelay", m_defaultVideoSettings.m_SubtitleDelay, 0.0f, -10.0f, 10.0f);
     XMLUtils::GetBoolean(pElement, "autocrop", m_defaultVideoSettings.m_Crop);
     XMLUtils::GetBoolean(pElement, "nonlinstretch", m_defaultVideoSettings.m_CustomNonLinStretch);
-    XMLUtils::GetBoolean(pElement, "cinemascopeaspect", m_useCinemascopeAR);
+//    XMLUtils::GetBoolean(pElement, "cinemascopeaspect", m_useCinemascopeAR);
+    XMLUtils::GetInt(pElement, "overscanentryindex", m_overscanEntryIndex);
+    // Get names and index of overscan settings (if any)
+    TiXmlElement* pAltOverscan = pElement->FirstChildElement("alternativeoverscan");
+    if (pAltOverscan)
+    {
+      OverscanEntry overscanEntry;
+      TiXmlElement* pOverscanEntry = pAltOverscan->FirstChildElement("overscanentry");
+      while (pOverscanEntry)
+      {
+        if (XMLUtils::GetString(pOverscanEntry,"name", overscanEntry.name) &&
+            XMLUtils::GetInt(pOverscanEntry,"index", overscanEntry.index))
+        {
+          m_overscanEntries.push_back(overscanEntry);
+        }
+        pOverscanEntry = pOverscanEntry->NextSiblingElement("overscanentry");
+      }
+    }    
 
     m_defaultVideoSettings.m_SubtitleCached = false;
   }
@@ -900,7 +927,21 @@ bool CSettings::SaveSettings(const CStdString& strSettingsFile, CGUISettings *lo
   XMLUtils::SetFloat(pNode, "subtitledelay", m_defaultVideoSettings.m_SubtitleDelay);
   XMLUtils::SetBoolean(pNode, "autocrop", m_defaultVideoSettings.m_Crop); 
   XMLUtils::SetBoolean(pNode, "nonlinstretch", m_defaultVideoSettings.m_CustomNonLinStretch);
-  XMLUtils::SetBoolean(pNode, "cinemascopeaspect", m_useCinemascopeAR);
+//  XMLUtils::SetBoolean(pNode, "cinemascopeaspect", m_useCinemascopeAR);
+  XMLUtils::SetInt(pNode, "overscanentryindex", m_overscanEntryIndex);
+  // Save names and index of overscan settings (if any)
+  if (m_overscanEntries.size() > 0)
+  {
+    TiXmlElement altOverscanNode("alternativeoverscan");
+    TiXmlNode *pAltOverscanNode  = pNode->InsertEndChild(altOverscanNode);
+    for (vector<OverscanEntry>::const_iterator it = m_overscanEntries.begin(); it != m_overscanEntries.end(); ++it)
+    {
+      TiXmlElement overscanEntry("overscanentry");
+      TiXmlNode *pOverscanEntryNode = pAltOverscanNode->InsertEndChild(overscanEntry);
+      XMLUtils::SetInt(pOverscanEntryNode, "index", it->index);
+      XMLUtils::SetString(pOverscanEntryNode, "name", it->name);
+    }
+  }
 
 
   // audio settings
