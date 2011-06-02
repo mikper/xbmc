@@ -513,6 +513,7 @@ bool CSettings::LoadCalibration(const TiXmlElement* pRoot, const CStdString& str
           GetInteger(pOverscan, "bottom", m_ResInfo[res].OverscanVect[0].bottom, m_ResInfo[res].iHeight, m_ResInfo[res].iHeight / 2, m_ResInfo[res].iHeight*3 / 2);
         }
 
+        // Handle multiple overscan settings (display ascpect ratio) 
         for (int osi = 1 ; osi < (int)m_overscanEntries.size(); osi++)
         {
           char elName[16];
@@ -527,9 +528,7 @@ bool CSettings::LoadCalibration(const TiXmlElement* pRoot, const CStdString& str
           }
         }
 
-//        if (g_settings.m_useCinemascopeAR)
-//	        m_ResInfo[res].Overscan = m_ResInfo[res].OverscanVect[1];
-//        else
+
 	      m_ResInfo[res].Overscan = m_ResInfo[res].OverscanVect[m_overscanEntryIndex];
 
         // get the appropriate "safe graphics area" = 10% for 4x3, 3.5% for 16x9
@@ -591,9 +590,6 @@ bool CSettings::SaveCalibration(TiXmlNode* pRootNode) const
     // create the overscan child
     TiXmlElement overscanElement("overscan");
     vector<OVERSCAN> tmpOverscanVect(m_ResInfo[i].OverscanVect);
-//    if (m_useCinemascopeAR)
-//      tmpOverscanVect[1] = m_ResInfo[i].Overscan;
-//    else
 		tmpOverscanVect[m_overscanEntryIndex] = m_ResInfo[i].Overscan;
 
     TiXmlNode *pOverscanNode = pNode->InsertEndChild(overscanElement);
@@ -602,6 +598,7 @@ bool CSettings::SaveCalibration(TiXmlNode* pRootNode) const
     XMLUtils::SetInt(pOverscanNode, "right", tmpOverscanVect[0].right);
     XMLUtils::SetInt(pOverscanNode, "bottom", tmpOverscanVect[0].bottom);
     
+    // Handle multiple overscan settings (display ascpect ratio) 
     for (int osi = 1; osi < (int)m_overscanEntries.size(); osi++)
     {
       char elName[16];
@@ -738,9 +735,24 @@ bool CSettings::LoadSettings(const CStdString& strSettingsFile)
     GetFloat(pElement, "subtitledelay", m_defaultVideoSettings.m_SubtitleDelay, 0.0f, -10.0f, 10.0f);
     XMLUtils::GetBoolean(pElement, "autocrop", m_defaultVideoSettings.m_Crop);
     XMLUtils::GetBoolean(pElement, "nonlinstretch", m_defaultVideoSettings.m_CustomNonLinStretch);
-//    XMLUtils::GetBoolean(pElement, "cinemascopeaspect", m_useCinemascopeAR);
     XMLUtils::GetInt(pElement, "overscanentryindex", m_overscanEntryIndex);
+
+    // Handle multiple overscan settings (display ascpect ratio) 
     // Get names and index of overscan settings (if any)
+    // See format below
+    /*
+    <alternativeoverscan>
+      <overscanentry>
+        <name>Normal</name>
+        <index>0</index>
+      <overscanentry>
+      <overscanentry>
+        <name>Cinemascope</name>
+        <index>1</index>
+      <overscanentry>
+    <alternativeoverscan>
+    */
+    
     TiXmlElement* pAltOverscan = pElement->FirstChildElement("alternativeoverscan");
     if (pAltOverscan)
     {
@@ -927,7 +939,8 @@ bool CSettings::SaveSettings(const CStdString& strSettingsFile, CGUISettings *lo
   XMLUtils::SetFloat(pNode, "subtitledelay", m_defaultVideoSettings.m_SubtitleDelay);
   XMLUtils::SetBoolean(pNode, "autocrop", m_defaultVideoSettings.m_Crop); 
   XMLUtils::SetBoolean(pNode, "nonlinstretch", m_defaultVideoSettings.m_CustomNonLinStretch);
-//  XMLUtils::SetBoolean(pNode, "cinemascopeaspect", m_useCinemascopeAR);
+  
+  // Handle multiple overscan settings 
   XMLUtils::SetInt(pNode, "overscanentryindex", m_overscanEntryIndex);
   // Save names and index of overscan settings (if any)
   if (m_overscanEntries.size() > 0)
